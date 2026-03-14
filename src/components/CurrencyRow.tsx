@@ -1,8 +1,10 @@
+import { CurrencyCombobox } from "./CurrencyCombobox";
 import type { CurrencyItem } from "../types";
 
 interface Props {
   item: CurrencyItem;
   divineRate: number;
+  currencyOptions: string[];
   onChange: (item: CurrencyItem) => void;
   onRemove: () => void;
 }
@@ -14,7 +16,7 @@ function parseFraction(numerator: string, denominator: string): number | null {
   return n / d;
 }
 
-export function CurrencyRow({ item, divineRate, onChange, onRemove }: Props) {
+export function CurrencyRow({ item, divineRate, currencyOptions, onChange, onRemove }: Props) {
   const divPrice = parseFraction(
     item.divinePriceNumerator,
     item.divinePriceDenominator
@@ -55,12 +57,10 @@ export function CurrencyRow({ item, divineRate, onChange, onRemove }: Props) {
   return (
     <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
       <div className="flex items-center gap-3 flex-wrap">
-        <input
-          type="text"
+        <CurrencyCombobox
           value={item.name}
-          onChange={(e) => onChange({ ...item, name: e.target.value })}
-          placeholder="Item name"
-          className="w-36 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-sm focus:outline-none focus:border-blue-400"
+          onChange={(name) => onChange({ ...item, name })}
+          options={currencyOptions}
         />
 
         <div className="flex items-center gap-1 text-sm">

@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { CurrencyRow } from "./components/CurrencyRow";
+import { DEFAULT_CURRENCIES } from "./data/currencies";
 import type { CurrencyItem } from "./types";
 
 function createItem(): CurrencyItem {
@@ -18,13 +20,29 @@ function App() {
   const [items, setItems] = useLocalStorage<CurrencyItem[]>("items", [
     createItem(),
   ]);
+  const [customCurrencies, setCustomCurrencies] = useLocalStorage<string[]>(
+    "customCurrencies",
+    []
+  );
 
   const rate = parseFloat(divineRate);
+
+  const currencyOptions = useMemo(() => {
+    const set = new Set([...DEFAULT_CURRENCIES, ...customCurrencies]);
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [customCurrencies]);
 
   const updateItem = (index: number, item: CurrencyItem) => {
     const next = [...items];
     next[index] = item;
     setItems(next);
+    if (
+      item.name &&
+      !DEFAULT_CURRENCIES.includes(item.name) &&
+      !customCurrencies.includes(item.name)
+    ) {
+      setCustomCurrencies([...customCurrencies, item.name]);
+    }
   };
 
   const removeItem = (index: number) => {
@@ -71,6 +89,7 @@ function App() {
             key={item.id}
             item={item}
             divineRate={rate}
+            currencyOptions={currencyOptions}
             onChange={(updated) => updateItem(i, updated)}
             onRemove={() => removeItem(i)}
           />
